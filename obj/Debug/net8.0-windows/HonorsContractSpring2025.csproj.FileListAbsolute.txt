@@ -1,0 +1,16 @@
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.AssemblyInfoInputs.cache
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.AssemblyInfo.cs
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.csproj.CoreCompileInputs.cache
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.MainForm.resources
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.csproj.GenerateResource.cache
+C:\Users\Ethan\HonorsContractSpring2025\bin\Debug\net8.0-windows\HonorsContractSpring2025.exe
+C:\Users\Ethan\HonorsContractSpring2025\bin\Debug\net8.0-windows\HonorsContractSpring2025.deps.json
+C:\Users\Ethan\HonorsContractSpring2025\bin\Debug\net8.0-windows\HonorsContractSpring2025.runtimeconfig.json
+C:\Users\Ethan\HonorsContractSpring2025\bin\Debug\net8.0-windows\HonorsContractSpring2025.dll
+C:\Users\Ethan\HonorsContractSpring2025\bin\Debug\net8.0-windows\HonorsContractSpring2025.pdb
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.dll
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\refint\HonorsContractSpring2025.dll
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.pdb
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\HonorsContractSpring2025.genruntimeconfig.cache
+C:\Users\Ethan\HonorsContractSpring2025\obj\Debug\net8.0-windows\ref\HonorsContractSpring2025.dll
