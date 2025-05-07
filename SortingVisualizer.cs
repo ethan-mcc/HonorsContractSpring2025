@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.Diagnostics;
 
 namespace AlgorithmVisualizer
 {
@@ -28,6 +29,9 @@ namespace AlgorithmVisualizer
         private bool insertionSortMoving = false;
 
         public int Steps { get; private set; } = 0;
+        public long NanosecondsTaken { get; private set; } = 0;
+        public long CpuCyclesTaken { get; private set; } = 0;
+        public long MemoryUsed { get; private set; } = 0;
 
         public SortingVisualizer(Panel panel)
         {
@@ -80,12 +84,21 @@ namespace AlgorithmVisualizer
             insertionSortMoving = false;
 
             Steps = 0;
+            NanosecondsTaken = 0;
+            CpuCyclesTaken = 0;
+            MemoryUsed = 0;
+            
             DrawArray();
         }
 
         public bool NextStep()
         {
             Steps++;
+            
+            long memoryBefore = GC.GetTotalMemory(false);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             bool completed = false;
 
             switch (currentAlgorithm)
@@ -97,6 +110,14 @@ namespace AlgorithmVisualizer
                     completed = InsertionSortStep();
                     break;
             }
+
+            stopwatch.Stop();
+            long memoryAfter = GC.GetTotalMemory(false);
+            
+            // Update performance metrics
+            NanosecondsTaken += stopwatch.ElapsedTicks * (1000000000L / Stopwatch.Frequency);
+            CpuCyclesTaken += stopwatch.ElapsedTicks;
+            MemoryUsed += Math.Max(0, memoryAfter - memoryBefore);
 
             DrawArray();
             return completed;

@@ -20,6 +20,8 @@ namespace HonorsContractSpring2025
 
         private SortingVisualizer sortingVisualizer;
         private PathfindingVisualizer pathfindingVisualizer;
+        private AStarPathfinder aStarPathfinder;
+        private DijkstraPathfinder dijkstraPathfinder;
         private IAlgorithmVisualizer currentVisualizer;
 
         private bool isPlaying = false;
@@ -29,6 +31,21 @@ namespace HonorsContractSpring2025
             InitializeComponent();
             InitializeUI();
             SetupEventHandlers();
+
+            // Initialize visualizers
+            sortingVisualizer = new SortingVisualizer(visualizationPanel);
+            pathfindingVisualizer = new PathfindingVisualizer(visualizationPanel);
+            aStarPathfinder = new AStarPathfinder(visualizationPanel);
+            dijkstraPathfinder = new DijkstraPathfinder(visualizationPanel);
+
+            // Set default visualizer
+            currentVisualizer = sortingVisualizer;
+            sortingVisualizer.SetAlgorithm(SortAlgorithm.BubbleSort);
+
+            // Set up animation timer
+            animationTimer = new Timer();
+            animationTimer.Interval = 200; // Default speed
+            animationTimer.Tick += AnimationTimer_Tick;
         }
 
         private void InitializeUI()
@@ -43,7 +60,13 @@ namespace HonorsContractSpring2025
                 BackColor = Color.White,
                 Font = new Font("Segoe UI", 9F)
             };
-            algorithmSelector.Items.AddRange(new string[] { "Bubble Sort", "Insertion Sort", "Breadth-First Search" });
+            algorithmSelector.Items.AddRange(new string[] { 
+                "Bubble Sort", 
+                "Insertion Sort", 
+                "Breadth-First Search",
+                "A* Pathfinding",
+                "Dijkstra's Algorithm"
+            });
             algorithmSelector.SelectedIndex = 0;
 
             // Modern button style
@@ -171,79 +194,95 @@ namespace HonorsContractSpring2025
             this.Controls.Add(complexityLabel);
             this.Controls.Add(stepsLabel);
 
-            // Initialize visualizers
-            sortingVisualizer = new SortingVisualizer(visualizationPanel);
-            pathfindingVisualizer = new PathfindingVisualizer(visualizationPanel);
-            currentVisualizer = sortingVisualizer;
-
-            // Setup timer
-            animationTimer = new Timer
-            {
-                Interval = 100
-            };
+            // Set form properties
+            this.Text = "Algorithm Visualizer";
+            this.Size = new Size(1000, 700);
+            this.BackColor = Color.FromArgb(236, 240, 241);
+            this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void SetupEventHandlers()
         {
             algorithmSelector.SelectedIndexChanged += AlgorithmSelector_SelectedIndexChanged;
-            generateButton.Click += GenerateButton_Click;
             playButton.Click += PlayButton_Click;
             pauseButton.Click += PauseButton_Click;
             resetButton.Click += ResetButton_Click;
+            generateButton.Click += GenerateButton_Click;
             speedSlider.ValueChanged += SpeedSlider_ValueChanged;
-            animationTimer.Tick += AnimationTimer_Tick;
         }
 
         private void AlgorithmSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            isPlaying = false;
+            // Reset the current visualizer
+            if (currentVisualizer != null)
+            {
+                currentVisualizer.Reset();
+            }
+
+            // Stop the animation timer
             animationTimer.Stop();
+            isPlaying = false;
             playButton.Enabled = true;
             pauseButton.Enabled = false;
 
-            switch (algorithmSelector.SelectedIndex)
+            int selectedIndex = algorithmSelector.SelectedIndex;
+
+            // Show/hide the array size input and generate button for appropriate algorithms
+            arraySizeInput.Visible = true;
+            generateButton.Visible = true;
+
+            // Set algorithm information
+            infoLabel.Text = GetAlgorithmDescription(selectedIndex);
+            complexityLabel.Text = "Time Complexity: " + GetAlgorithmComplexity(selectedIndex);
+            stepsLabel.Text = "Steps: 0";
+
+            switch (selectedIndex)
             {
                 case 0: // Bubble Sort
                 case 1: // Insertion Sort
                     currentVisualizer = sortingVisualizer;
-                    arraySizeInput.Visible = true;
-                    generateButton.Visible = true;
-                    complexityLabel.Text = algorithmSelector.SelectedIndex == 0 
-                        ? "Time Complexity: O(n²)" 
-                        : "Time Complexity: O(n²)";
+                    sortingVisualizer.SetAlgorithm(selectedIndex == 0 ? SortAlgorithm.BubbleSort : SortAlgorithm.InsertionSort);
                     break;
                 case 2: // BFS
                     currentVisualizer = pathfindingVisualizer;
-                    arraySizeInput.Visible = false;
-                    generateButton.Visible = true;
-                    complexityLabel.Text = "Time Complexity: O(V + E)";
+                    break;
+                case 3: // A* Pathfinding
+                    currentVisualizer = aStarPathfinder;
+                    break;
+                case 4: // Dijkstra's Algorithm
+                    currentVisualizer = dijkstraPathfinder;
                     break;
             }
 
-            stepsLabel.Text = "Steps: 0";
-            currentVisualizer.Reset();
-            infoLabel.Text = GetAlgorithmDescription(algorithmSelector.SelectedIndex);
+            // Generate new data for the selected algorithm
+            GenerateButton_Click(this, EventArgs.Empty);
         }
 
         private void GenerateButton_Click(object sender, EventArgs e)
         {
-            isPlaying = false;
+            // Stop the animation timer
             animationTimer.Stop();
+            isPlaying = false;
             playButton.Enabled = true;
             pauseButton.Enabled = false;
 
-            switch (algorithmSelector.SelectedIndex)
+            int selectedIndex = algorithmSelector.SelectedIndex;
+            int size = (int)arraySizeInput.Value;
+
+            switch (selectedIndex)
             {
                 case 0: // Bubble Sort
-                    sortingVisualizer.GenerateRandomArray((int)arraySizeInput.Value);
-                    sortingVisualizer.SetAlgorithm(SortAlgorithm.BubbleSort);
-                    break;
                 case 1: // Insertion Sort
-                    sortingVisualizer.GenerateRandomArray((int)arraySizeInput.Value);
-                    sortingVisualizer.SetAlgorithm(SortAlgorithm.InsertionSort);
+                    sortingVisualizer.GenerateRandomArray(size);
                     break;
                 case 2: // BFS
                     pathfindingVisualizer.GenerateRandomGrid();
+                    break;
+                case 3: // A* Pathfinding
+                    aStarPathfinder.GenerateRandomGrid();
+                    break;
+                case 4: // Dijkstra's Algorithm
+                    dijkstraPathfinder.GenerateRandomGrid();
                     break;
             }
 
@@ -252,50 +291,56 @@ namespace HonorsContractSpring2025
 
         private void PlayButton_Click(object sender, EventArgs e)
         {
-            isPlaying = true;
-            animationTimer.Start();
             playButton.Enabled = false;
             pauseButton.Enabled = true;
+            isPlaying = true;
+            animationTimer.Start();
         }
 
         private void PauseButton_Click(object sender, EventArgs e)
         {
-            isPlaying = false;
             animationTimer.Stop();
             playButton.Enabled = true;
             pauseButton.Enabled = false;
+            isPlaying = false;
         }
 
         private void ResetButton_Click(object sender, EventArgs e)
         {
-            isPlaying = false;
             animationTimer.Stop();
+            isPlaying = false;
             playButton.Enabled = true;
             pauseButton.Enabled = false;
+
             currentVisualizer.Reset();
             stepsLabel.Text = "Steps: 0";
         }
 
         private void SpeedSlider_ValueChanged(object sender, EventArgs e)
         {
-            // Speed is inversely proportional to interval
-            animationTimer.Interval = 500 / speedSlider.Value;
+            // Invert the speed slider so that higher value = faster animation
+            animationTimer.Interval = 600 / speedSlider.Value;
         }
 
         private void AnimationTimer_Tick(object sender, EventArgs e)
         {
             if (isPlaying)
             {
-                bool isCompleted = currentVisualizer.NextStep();
-                stepsLabel.Text = $"Steps: {currentVisualizer.Steps}";
+                bool isComplete = currentVisualizer.NextStep();
+                stepsLabel.Text = "Steps: " + currentVisualizer.Steps;
 
-                if (isCompleted)
+                // Update algorithm information
+                int selectedIndex = algorithmSelector.SelectedIndex;
+                infoLabel.Text = GetAlgorithmDescription(selectedIndex);
+
+                // If algorithm is complete, stop the animation
+                if (isComplete)
                 {
-                    isPlaying = false;
                     animationTimer.Stop();
+                    isPlaying = false;
                     playButton.Enabled = true;
                     pauseButton.Enabled = false;
-                    infoLabel.Text = "Algorithm completed!";
+                    infoLabel.Text = "Algorithm completed. " + infoLabel.Text;
                 }
             }
         }
@@ -305,11 +350,34 @@ namespace HonorsContractSpring2025
             switch (algorithmIndex)
             {
                 case 0:
-                    return "Bubble Sort: A simple sorting algorithm that repeatedly steps through the list, compares adjacent elements and swaps them if they are in wrong order.";
+                    return "Bubble Sort: A simple sorting algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.";
                 case 1:
-                    return "Insertion Sort: Builds the sorted array one item at a time by comparing each with the prior elements.";
+                    return "Insertion Sort: A simple sorting algorithm that builds the final sorted array one item at a time.";
                 case 2:
-                    return "Breadth-First Search: Explores all neighbor nodes at the present depth before moving on to nodes at the next depth level.";
+                    return "Breadth-First Search (BFS): A graph traversal algorithm that explores all the neighbor nodes at the present depth before moving to nodes at the next depth level.";
+                case 3:
+                    return "A* Pathfinding: A popular pathfinding algorithm that uses heuristics to find the shortest path between two points.";
+                case 4:
+                    return "Dijkstra's Algorithm: A graph search algorithm that finds the shortest path between nodes in a graph.";
+                default:
+                    return "Select an algorithm to see its description.";
+            }
+        }
+
+        private string GetAlgorithmComplexity(int algorithmIndex)
+        {
+            switch (algorithmIndex)
+            {
+                case 0:
+                    return "O(n²)";
+                case 1:
+                    return "O(n²)";
+                case 2:
+                    return "O(V + E)";
+                case 3:
+                    return "O(E log V)";
+                case 4:
+                    return "O(E log V)";
                 default:
                     return "";
             }

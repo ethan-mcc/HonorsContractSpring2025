@@ -231,7 +231,6 @@ namespace HonorsContractSpring2025
                 // Update with better path
                 parent[neighborPos] = current.Position;
                 neighbor.GScore = tentativeGScore;
-                neighbor.FScore = neighbor.GScore + neighbor.HScore;
 
                 if (!openSet.Contains(neighbor))
                 {
