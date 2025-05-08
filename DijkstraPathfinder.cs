@@ -390,7 +390,7 @@ namespace AlgorithmVisualizer
         }
     }
 
-    // PriorityQueue polyfill for older .NET versions if needed
+    // PriorityQueue polyfill 
     public class PriorityQueue<TElement, TPriority> where TPriority : IComparable<TPriority>
     {
         private readonly List<(TElement Element, TPriority Priority)> _elements = new List<(TElement, TPriority)>();
